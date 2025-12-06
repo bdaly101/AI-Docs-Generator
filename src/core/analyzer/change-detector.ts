@@ -134,7 +134,8 @@ export class ChangeDetector {
       change.diff.includes('(') && (change.diff.includes('+') || change.diff.includes('-'));
 
     // Check for return type changes
-    const hasReturnTypeChanges = change.diff.includes(':') && entity.returnType;
+    const hasReturnTypeChanges =
+      change.diff.includes(':') && Boolean(entity.returnType);
 
     return hasSignatureKeyword && (hasParameterChanges || hasReturnTypeChanges);
   }

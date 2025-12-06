@@ -8,7 +8,11 @@ export const ConfigSchema = z.object({
       model: z.string().default('claude-sonnet-4-5-20250929'),
       apiKey: z.string().optional(), // Falls back to env var
     })
-    .default({}),
+    .optional()
+    .default(() => ({
+      provider: 'anthropic' as const,
+      model: 'claude-sonnet-4-5-20250929',
+    })),
   readme: z
     .object({
       enabled: z.boolean().default(true),
@@ -16,7 +20,13 @@ export const ConfigSchema = z.object({
       sections: z.array(z.string()).default(['features', 'installation', 'usage']),
       updateOnNewFeature: z.boolean().default(true),
     })
-    .default({}),
+    .optional()
+    .default(() => ({
+      enabled: true,
+      path: 'README.md',
+      sections: ['features', 'installation', 'usage'],
+      updateOnNewFeature: true,
+    })),
   apiDocs: z
     .object({
       enabled: z.boolean().default(true),
@@ -24,7 +34,13 @@ export const ConfigSchema = z.object({
       format: z.enum(['markdown', 'html']).default('markdown'),
       includeExamples: z.boolean().default(true),
     })
-    .default({}),
+    .optional()
+    .default(() => ({
+      enabled: true,
+      outputPath: 'docs/api',
+      format: 'markdown' as const,
+      includeExamples: true,
+    })),
   jsdoc: z
     .object({
       enabled: z.boolean().default(true),
@@ -32,7 +48,13 @@ export const ConfigSchema = z.object({
       includeTypes: z.boolean().default(true),
       includeExamples: z.boolean().default(false),
     })
-    .default({}),
+    .optional()
+    .default(() => ({
+      enabled: true,
+      style: 'tsdoc' as const,
+      includeTypes: true,
+      includeExamples: false,
+    })),
   changelog: z
     .object({
       enabled: z.boolean().default(true),
@@ -40,7 +62,13 @@ export const ConfigSchema = z.object({
       format: z.enum(['keepachangelog', 'conventional']).default('keepachangelog'),
       groupBy: z.enum(['type', 'scope', 'date']).default('type'),
     })
-    .default({}),
+    .optional()
+    .default(() => ({
+      enabled: true,
+      path: 'CHANGELOG.md',
+      format: 'keepachangelog' as const,
+      groupBy: 'type' as const,
+    })),
   ignore: z
     .array(z.string())
     .default(['node_modules/**', 'dist/**', '**/*.test.ts', '**/*.spec.ts']),
