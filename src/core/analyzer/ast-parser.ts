@@ -68,7 +68,16 @@ export class ASTParser {
       // Export named declarations
       if (node.type === AST_NODE_TYPES.ExportNamedDeclaration) {
         if (node.declaration) {
-          const entity = this.extractFromDeclaration(node.declaration, code);
+          let entity: CodeEntity | null = null;
+          if (node.declaration.type === AST_NODE_TYPES.FunctionDeclaration) {
+            entity = this.extractFunction(node.declaration, code);
+          } else if (node.declaration.type === AST_NODE_TYPES.ClassDeclaration) {
+            entity = this.extractClass(node.declaration, code);
+          } else if (node.declaration.type === AST_NODE_TYPES.TSInterfaceDeclaration) {
+            entity = this.extractInterface(node.declaration, code);
+          } else if (node.declaration.type === AST_NODE_TYPES.TSTypeAliasDeclaration) {
+            entity = this.extractTypeAlias(node.declaration, code);
+          }
           if (entity) {
             entity.isExported = true;
             entities.push(entity);
@@ -78,9 +87,13 @@ export class ASTParser {
         if (node.specifiers) {
           for (const spec of node.specifiers) {
             if (spec.type === AST_NODE_TYPES.ExportSpecifier) {
+              const exportedName =
+                spec.exported.type === AST_NODE_TYPES.Identifier
+                  ? spec.exported.name
+                  : spec.exported.value;
               entities.push({
                 type: 'export',
-                name: spec.exported.name,
+                name: exportedName,
                 location: {
                   start: spec.range[0],
                   end: spec.range[1],
@@ -192,9 +205,13 @@ export class ASTParser {
 
   private extractVariable(
     node: TSESTree.VariableDeclarator,
-    kind: 'const' | 'let' | 'var',
+    kind: string,
     code: string
   ): CodeEntity {
+    // Only handle const, let, var (ignore 'using' and 'await using')
+    if (kind !== 'const' && kind !== 'let' && kind !== 'var') {
+      kind = 'const'; // Default fallback
+    }
     const name = node.id.type === AST_NODE_TYPES.Identifier ? node.id.name : 'unknown';
     const typeAnnotation =
       node.id.type === AST_NODE_TYPES.Identifier && node.id.typeAnnotation
@@ -213,24 +230,6 @@ export class ASTParser {
     };
   }
 
-  private extractFromDeclaration(
-    declaration: TSESTree.Declaration,
-    code: string
-  ): CodeEntity | null {
-    if (declaration.type === AST_NODE_TYPES.FunctionDeclaration) {
-      return this.extractFunction(declaration, code);
-    }
-    if (declaration.type === AST_NODE_TYPES.ClassDeclaration) {
-      return this.extractClass(declaration, code);
-    }
-    if (declaration.type === AST_NODE_TYPES.TSInterfaceDeclaration) {
-      return this.extractInterface(declaration, code);
-    }
-    if (declaration.type === AST_NODE_TYPES.TSTypeAliasDeclaration) {
-      return this.extractTypeAlias(declaration, code);
-    }
-    return null;
-  }
 
   private extractParameters(
     params: TSESTree.Parameter[]
@@ -262,7 +261,9 @@ export class ASTParser {
     return this.typeAnnotationToString(returnType.typeAnnotation);
   }
 
-  private typeAnnotationToString(typeAnnotation: TSESTree.TSType): string {
+  private typeAnnotationToString(
+    typeAnnotation: TSESTree.TSTypeAnnotation['typeAnnotation']
+  ): string {
     // Simplified type string extraction
     // This is a basic implementation - could be enhanced
     if (typeAnnotation.type === AST_NODE_TYPES.TSTypeReference) {

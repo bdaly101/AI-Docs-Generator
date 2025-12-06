@@ -87,3 +87,41 @@ This document tracks issues, improvements, and observations about the dev lifecy
 - Phase 1: ~90% efficient - infrastructure tools worked great
 - Phase 2: ~85% efficient - manual work was fine, but tools could have helped more
 
+## CI Pipeline Fix (Pre-Phase 3)
+
+### Issues Discovered
+- **TypeScript errors in CI** - 11 type errors passed local build but failed `tsc --noEmit` in CI
+- **Missing npm scripts** - No `lint`, `typecheck`, or `test:ci` scripts
+- **Workflow template gaps** - CI workflow didn't use proper script names
+- **Local vs CI mismatch** - `tsup` build passed but strict `tsc` checking failed
+
+### Root Causes
+1. **Zod v4 API changes** - `.default({})` no longer works, need function defaults
+2. **TypeScript strict checking** - `tsup` is less strict than `tsc --noEmit`
+3. **Package version mismatches** - ROADMAP examples used older API versions
+4. **Missing validation** - No pre-commit type checking
+
+### Fixes Applied
+- ✅ Fixed all 11 TypeScript errors (Zod schema, simpleGit import, TSESTree types)
+- ✅ Added `typecheck`, `lint`, `test:ci` scripts to package.json
+- ✅ Updated CI workflow template to use proper script names and make typecheck required
+- ✅ Verified all checks pass locally before commit
+
+### Lessons Learned
+1. **Always run `npm run typecheck` before commit** - catches errors `tsup` misses
+2. **CI workflow should match package.json scripts** - prevents "script not found" errors
+3. **Make typecheck a required CI check** - prevents merging broken code
+4. **Test locally what CI tests** - run exact same commands
+
+### Improvements Made to Lifecycle Tools
+- Updated `~/.github-templates/workflows/ci.yml`:
+  - Uses `npm run typecheck` with fallback to `npx tsc --noEmit`
+  - Uses `npm run test:ci` with fallback to `npm test -- --run`
+  - Makes typecheck a hard requirement (`continue-on-error: false`)
+
+### Recommendations for Phase 3+
+1. **Add pre-commit hook** - Run `npm run typecheck` before allowing commit
+2. **Document required scripts** - Add to DEV-LIFECYCLE-IMPLEMENTATION.md
+3. **Version check script** - Verify package versions match ROADMAP examples
+4. **CI status badge** - Add to README to show pipeline health
+
