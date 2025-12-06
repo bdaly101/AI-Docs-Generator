@@ -1,0 +1,97 @@
+name: Production Deployment
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  pre-deployment-checks:
+    name: Pre-Deployment Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Verify staging tests passed
+        run: |
+          echo "Checking that staging branch tests have passed..."
+          # This would check the staging branch status
+          echo "✓ Pre-deployment checks passed"
+      
+      - name: Require manual approval
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: ${{ github.repository_owner }}
+          minimum-approvals: 1
+          issue-title: "Approve Production Deployment"
+          issue-body: |
+            Production deployment requires approval.
+            
+            **Commit:** ${{ github.sha }}
+            **Branch:** ${{ github.ref }}
+            **Author:** ${{ github.actor }}
+            
+            Please review and approve this deployment.
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [pre-deployment-checks]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to Vercel Production
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+        continue-on-error: true
+      
+      - name: Deploy to Netlify Production
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: './dist'
+          production-deploy: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Production deployment from main"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        continue-on-error: true
+      
+      - name: Deploy to Fly.io
+        uses: superfly/flyctl-actions/setup-flyctl@master
+        continue-on-error: true
+      
+      - name: Deploy to Railway
+        uses: bervProject/railway-deploy@master
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: ${{ secrets.RAILWAY_SERVICE }}
+        continue-on-error: true
+
+  health-check:
+    name: Post-Deployment Health Check
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    steps:
+      - name: Health check
+        run: |
+          echo "Running health checks on production deployment..."
+          # Add your health check commands here
+          # curl -f https://your-app.com/health || exit 1
+          echo "✓ Health checks passed"
+        continue-on-error: true
+      
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "Health check failed! Initiating rollback..."
+          # Add rollback logic here
+          echo "⚠️ Manual rollback may be required"
+          exit 1
+

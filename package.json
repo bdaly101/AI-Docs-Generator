@@ -1,0 +1,42 @@
+{
+  "name": "ai-docs-generator",
+  "version": "1.0.0",
+  "description": "Auto-generate and update documentation from code changes using AI",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "aidocs": "./dist/index.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bdaly101/AI-Docs-Generator.git"
+  },
+  "keywords": ["documentation", "ai", "claude", "docs", "generator"],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bdaly101/AI-Docs-Generator/issues"
+  },
+  "homepage": "https://github.com/bdaly101/AI-Docs-Generator#readme",
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "commander": "^14.0.2",
+    "cosmiconfig": "^9.0.0",
+    "ora": "^9.0.0",
+    "simple-git": "^3.30.0",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  }
+}
