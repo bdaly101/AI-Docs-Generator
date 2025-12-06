@@ -7,7 +7,9 @@
   "bin": {
     "aidocs": "./dist/index.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -18,7 +20,13 @@
     "type": "git",
     "url": "git+https://github.com/bdaly101/AI-Docs-Generator.git"
   },
-  "keywords": ["documentation", "ai", "claude", "docs", "generator"],
+  "keywords": [
+    "documentation",
+    "ai",
+    "claude",
+    "docs",
+    "generator"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
@@ -26,6 +34,8 @@
   },
   "homepage": "https://github.com/bdaly101/AI-Docs-Generator#readme",
   "dependencies": {
+    "@typescript-eslint/parser": "^8.48.1",
+    "@typescript-eslint/types": "^8.48.1",
     "chalk": "^5.6.2",
     "commander": "^14.0.2",
     "cosmiconfig": "^9.0.0",
