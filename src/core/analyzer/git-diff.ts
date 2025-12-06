@@ -89,8 +89,8 @@ export class GitDiffAnalyzer {
     let oldPath = diffGitMatch?.[1] || oldPathMatch?.[1] || '';
     let newPath = diffGitMatch?.[2] || newPathMatch?.[1] || '';
 
-    // Handle deleted files (newPath is /dev/null)
-    if (newPath === '/dev/null') {
+    // Handle deleted files (newPath is /dev/null or empty)
+    if (newPath === '/dev/null' || newPath === '' || section.includes('deleted file')) {
       return {
         path: oldPath,
         status: 'deleted',
@@ -101,8 +101,8 @@ export class GitDiffAnalyzer {
       };
     }
 
-    // Handle added files (oldPath is /dev/null)
-    if (oldPath === '/dev/null') {
+    // Handle added files (oldPath is /dev/null or empty)
+    if (oldPath === '/dev/null' || oldPath === '' || section.includes('new file')) {
       return {
         path: newPath,
         status: 'added',
