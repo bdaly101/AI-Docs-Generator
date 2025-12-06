@@ -10,6 +10,9 @@
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -17,7 +20,7 @@
     "test:ci": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "echo 'No linter configured - add eslint or similar'",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build && npm run typecheck && npm run test:ci"
   },
   "repository": {
     "type": "git",
@@ -27,11 +30,17 @@
     "documentation",
     "ai",
     "claude",
+    "anthropic",
     "docs",
-    "generator"
+    "generator",
+    "readme",
+    "changelog",
+    "jsdoc",
+    "tsdoc",
+    "typescript"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "bdaly101",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/bdaly101/AI-Docs-Generator/issues"
   },

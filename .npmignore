@@ -1,0 +1,33 @@
+# Source files (dist is published)
+src/
+tests/
+
+# Config files
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+.aidocsrc.json
+
+# Development files
+.github/
+.vscode/
+.idea/
+coverage/
+*.log
+*.backup
+
+# Git
+.git/
+.gitignore
+
+# Documentation (README is kept)
+CONTRIBUTING.md
+ROADMAP.md
+DEV-LIFECYCLE-IMPROVEMENTS.md
+docs/
+
+# Misc
+*.tgz
+.DS_Store
+Thumbs.db
+
