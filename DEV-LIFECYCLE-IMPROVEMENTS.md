@@ -42,9 +42,11 @@ This document tracks issues, improvements, and observations about the dev lifecy
   - For simple unit tests, manual might be faster than AI generation
 
 ### PR Workflow
-- **Status**: Using feature branch, will create PR manually
+- **Status**: Feature branch pushed, PR created manually via GitHub
+- **Issue**: git-ai-pr-workflow requires profile setup (`work-personal` or `work-synergycrm`)
 - **Observation**: Feature branch workflow works well
-- **Note**: git-ai-pr-workflow could be useful for automated PR creation with AI review
+- **Note**: git-ai-pr-workflow could be useful for automated PR creation with AI review, but requires profile configuration
+- **Suggestion**: Document profile setup in dev lifecycle docs or provide default profile
 
 ### What Worked Well in Phase 2
 - ✅ Feature branch creation - clean separation
